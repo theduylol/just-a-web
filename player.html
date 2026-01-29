@@ -1,45 +1,62 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Video Player</title>
+  <title>Media Player</title>
+  <meta charset="utf-8">
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    video, audio, img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+  </style>
 </head>
-<body style="margin:0;background:black">
-  <video id="v" controls autoplay style="width:100%;height:100%"></video>
+<body>
 
-  <script>
-const params = new URLSearchParams(location.search);
-const media = params.get("media");
-if (!media) return;
+<script>
+(function () {
+    const params = new URLSearchParams(location.search);
+    const media = params.get("media");
+    if (!media) return;
 
-const url = decodeURIComponent(media);
-const ext = url.split('.').pop().toLowerCase();
+    const url = decodeURIComponent(media);
+    const ext = url.split('.').pop().toLowerCase();
 
-const videoExt = ["mp4","webm","mkv","avi","mov"];
-const audioExt = ["mp3","wav","ogg","flac","m4a"];
-const imageExt = ["png","jpg","jpeg","gif","webp","bmp"];
+    const videoExt = ["mp4","webm","mkv","avi","mov"];
+    const audioExt = ["mp3","wav","ogg","flac","m4a"];
+    const imageExt = ["png","jpg","jpeg","gif","webp","bmp"];
 
-let el;
+    let el;
 
-if (videoExt.includes(ext)) {
-    el = document.createElement("video");
-    el.controls = true;
-    el.autoplay = true;
-} else if (audioExt.includes(ext)) {
-    el = document.createElement("audio");
-    el.controls = true;
-    el.autoplay = true;
-} else if (imageExt.includes(ext)) {
-    el = document.createElement("img");
-    el.style.maxWidth = "100%";
-    el.style.maxHeight = "100%";
-}
+    if (videoExt.includes(ext)) {
+        el = document.createElement("video");
+        el.controls = true;
+        el.autoplay = true;
+    } 
+    else if (audioExt.includes(ext)) {
+        el = document.createElement("audio");
+        el.controls = true;
+        el.autoplay = true;
+    } 
+    else if (imageExt.includes(ext)) {
+        el = document.createElement("img");
+    } 
+    else {
+        document.body.innerHTML = "<h2 style='color:white'>Unsupported file</h2>";
+        return;
+    }
 
-if (el) {
     el.src = url;
-    document.body.style.margin = "0";
-    document.body.style.background = "black";
     document.body.appendChild(el);
-}
+})();
 </script>
 
 </body>
