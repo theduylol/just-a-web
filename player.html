@@ -7,12 +7,40 @@
   <video id="v" controls autoplay style="width:100%;height:100%"></video>
 
   <script>
-    const params = new URLSearchParams(location.search);
-    const video = params.get("video");
+const params = new URLSearchParams(location.search);
+const media = params.get("media");
+if (!media) return;
 
-    if (video) {
-      document.getElementById("v").src = decodeURIComponent(video);
-    }
-  </script>
+const url = decodeURIComponent(media);
+const ext = url.split('.').pop().toLowerCase();
+
+const videoExt = ["mp4","webm","mkv","avi","mov"];
+const audioExt = ["mp3","wav","ogg","flac","m4a"];
+const imageExt = ["png","jpg","jpeg","gif","webp","bmp"];
+
+let el;
+
+if (videoExt.includes(ext)) {
+    el = document.createElement("video");
+    el.controls = true;
+    el.autoplay = true;
+} else if (audioExt.includes(ext)) {
+    el = document.createElement("audio");
+    el.controls = true;
+    el.autoplay = true;
+} else if (imageExt.includes(ext)) {
+    el = document.createElement("img");
+    el.style.maxWidth = "100%";
+    el.style.maxHeight = "100%";
+}
+
+if (el) {
+    el.src = url;
+    document.body.style.margin = "0";
+    document.body.style.background = "black";
+    document.body.appendChild(el);
+}
+</script>
+
 </body>
 </html>
