@@ -11,10 +11,23 @@
 </button>
 
 <script>
-document.getElementById("startBtn").onclick = function(){
+document.getElementById("startBtn").onclick = async function(){
 
-    // Just connect. No checks. No waiting.
-    window.ws = new WebSocket("ws://seq.wtf/px");
+    if(!window.ws || window.ws.readyState !== 1){
+        window.ws = new WebSocket("ws://seq.wtf/px");
+
+        await new Promise((resolve,reject)=>{
+            window.ws.onopen = resolve;
+            window.ws.onerror = reject;
+        }).catch(()=>{
+            alert("WebSocket connection failed.");
+        });
+    }
+
+    if(!window.ws || window.ws.readyState !== 1){
+        alert("WebSocket not ready.");
+        return;
+    }
 
     const GRID = 128;
 
@@ -107,6 +120,63 @@ document.getElementById("startBtn").onclick = function(){
 
                 const canvas=document.createElement("canvas");
                 const ctx=canvas.getContext("2d");
+                canvas.width=GRID;
+                canvas.height=GRID;
+
+                function frame(){
+                    if(video.paused||video.ended){
+                        resolve();
+                        return;
+                    }
+                    ctx.drawImage(video,0,0,GRID,GRID);
+                    const data=ctx.getImageData(0,0,GRID,GRID).data;
+
+                    const pixels=[];
+                    for(let y=0;y<GRID;y++){
+                        for(let x=0;x<GRID;x++){
+                            const i=(y*GRID+x)*4;
+                            pixels.push({
+                                x,y,
+                                c:closest(data[i],data[i+1],data[i+2])
+                            });
+                        }
+                    }
+
+                    sendPixels(pixels);
+                    requestAnimationFrame(frame);
+                }
+
+                video.onplay=frame;
+            };
+            input.click();
+        });
+    }
+
+    async function menu(){
+        while(true){
+            const choice = prompt(
+`==== JS Canvas Menu ====
+1. Full Black
+2. Full White (Flashbang)
+3. Upload Image
+4. Upload Video
+0. Exit`
+            );
+
+            if(choice==="1") fullColor(3);
+            else if(choice==="2") fullColor(0);
+            else if(choice==="3") await uploadImage();
+            else if(choice==="4") await uploadVideo();
+            else if(choice==="0" || choice===null) break;
+        }
+    }
+
+    menu();
+};
+</script>
+
+</body>
+</html>
                 canvas.width=GRID;
                 canvas.height=GRID;
 
